@@ -86,7 +86,7 @@ void taking_measures() {
 
   /*
   //Si on y arrive
-  float pack_SOC = determine_SOH(???);
+  float pack_SOH = determine_SOH(???);
   measure_and_save("bat600.txt",date,pack_SOH);
   */
 
