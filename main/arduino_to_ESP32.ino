@@ -133,7 +133,7 @@ void analyse_query(String msg){
       read_data_and_send("ESP32","bat600.txt");
     }
     else if (msg=="get_battery_temperature"){
-      read_data_and_send("ESP32","bat401.txt");
+      read_data_and_send("ESP32","bat400.txt");
     }
     else if (msg=="get_charge_current"){
       read_data_and_send("ESP32","chr010.txt");

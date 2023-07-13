@@ -2,7 +2,7 @@
 Pour la personne qui va lire ce code:
     Le rôle de ce paquet de fonction est de prendre une succession de mesures et les écrire dans la carte SD.
     C'est donc ici que l'Arduino demande l'heure/date à l'ESP32 au travers de "measure_and_save()" et écrira la data sous
-    une forme voulue.
+    une forme voulue. (Ex: 13/07/2023 11:10:02 # 27.76)
 */
 //____________________________USEFULL FUNCTIONS_______________________//
 
@@ -37,7 +37,7 @@ void taking_measures() {
   
   //Thermistance
   float calculateThermistance_value = calculateThermistance();
-  measure_and_save("bat401.txt",date,calculateThermistance_value);
+  measure_and_save("bat400.txt",date,calculateThermistance_value);
 
 
   //Courant

@@ -87,7 +87,11 @@ void read_data_and_send(String target,String filename){
         //Serial.println(buffer);
         
         send_data(target,String(buffer));
+        
+        //ATTENTION, POINT CRITIQUE POUR LA COMMUNIQUATION AVEC ESP32. Ce point doit BIEN être géré
         answering_mode = false; //Maintenant qu'on a répondu, on se libère du mode answering_mode et on a de nouveau le droit d'envoyer des requêtes à ESP32
+        
+        
         memset(buffer, '\0', sizeof(buffer)); // clear the buffer
       }
       //Serial2.write(file.read());//Envoie la data à l'ESP par Serial2
