@@ -107,19 +107,19 @@ void writingReport(float arr[], String filename){
   int getArrayLength = sizeof(arr) / sizeof(float);
 
   if (myReport) {
-    myReport.print("Le courant moyen des Panneau Photovoltaique vaut: "+String(PV_mean_current)+" Amper");
+    myReport.println("Le courant moyen des Panneau Photovoltaique vaut: "+String(PV_mean_current)+" Amper \n");
     delay(100);
 
-    myReport.print("La tension moyenne du pack de batterie vaut : "+String(pack_bat_mean_voltage)+" Volt");
+    myReport.println("La tension moyenne du pack de batterie vaut : "+String(pack_bat_mean_voltage)+" Volt \n");
     delay(100);
 
-    myReport.print("Le courant moyen en sortie du pack de batterie vaut : "+String(pack_bat_mean_current)+" Amper");
+    myReport.println("Le courant moyen en sortie du pack de batterie vaut : "+String(pack_bat_mean_current)+" Amper \n");
     delay(100);
     
-    myReport.print("La temperature moyenne des batteries vaut : "+String(bat_mean_temperature)+" Celsius");
+    myReport.println("La temperature moyenne des batteries vaut : "+String(bat_mean_temperature)+" Celsius \n");
     delay(100);
 
-    myReport.print("L'etat de charge moyen du pack de batteries vaut : "+String(pack_bat_SOC)+" %");
+    myReport.println("L'etat de charge moyen du pack de batteries vaut : "+String(pack_bat_SOC)+" % \n");
     delay(100);
     
     

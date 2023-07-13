@@ -3,37 +3,12 @@ Pour la personne qui va lire ce code:
     -Tout échange de données avec l'ESP32 se font ici. C'est une communcation UART utilisant Serial2 (Rx2/Tx2) pour envoyer/recevoir la data
     -Pour éviter quelques problèmes d'interprétation des données, nous videons le Serial2 à chaque fois qu'on l'on envoit une requête à ESP32
       Cela permet d'être beaucoup sûr que ce qui est recu soit bel et bien une réponde à notre requête.
-    ATTENTION: La carte SD a un comportement étrange pour les noms. Elle n'accepte pas plus de 7 caractères pour un nom de fichier
-      et étrangement, elle n'accepte plus une arborescence de dossier/fichier. Dès lors, une pseudo-arborescence a été crée dans le nom
-      même des fichier:
-      Les 3 premiers caractères expriment le système dont on s'intéresse.
-        -Battery : bat
-        -Panneau photovoltaique : ppv
-        -Reseau : res
-        -Charges : chr
-
-      La valeur suivante permet de savoir quelle mesures nous intéresse:
-        -courant : 0
-        -tension  : 1
-        -puissance : 2
-        -temperature : 4
-        -SOC : 3
-        -SOH : 5
-
-      La valeur suivante permet de savoir si la mesure est entrante/sortante/aucune:
-        -aucune : 0
-        -entrante : 1
-        -sortante : 2
-        
-
-      Enfin, la dernierè valeur est différente de 0 ssi on mesure une ligne de battery particulière:
-        -pack de batteries OU pas de battery : 0
-        -ligne 1 : 1
-        -ligne 2 : 2
-        -ligne 3 : 3
-        -ligne 4 : 4
+    -Le mode mode answering_mode est un mode permettant d'empecher TOUT envoie de requete vers l'esp32. Ca permet de synchroniser Arduino-ESP32 de sorte à ce qu'il soit
+      impossible d'envoyer un requete comme "reponse" à l'esp32. Pour ce faire, lorsque ESP32 envoie une requete, il envoie d'abord "set_mode_to_hearing" pour prévenir
+      Arduino d'arreter d'envoyer des queries. De là, on sait que tout ce qui vient de Arduino est une réponse pertinente (en théorie).
+      -ATTENTION : C'est à la fin de la fonction "read_data_and_send(target,filename)" que Arduino se libère du mode "answering_mode". DOnc après l'envoie d'une réponse
+         on libère toujours => impossible de rester bloquer dans ce mode!
 */
-
 //____________________________USEFULL FUNCTIONS_______________________//
 void clean_Serial2_Port() {
   //Knowing sometimes, the serial keep some noisy bits (during manipulation), this funnction allows to
@@ -49,12 +24,19 @@ String send_query_ESP32(String my_query,int waiting_time){
   //La fonction send_query() est appelée au niveau de asynch_server
 
   //Serial2.println("Here's my query : "+my_query+"! You have "+String(waiting_time)+" seconds to give me the answer!");
-  clean_Serial2_Port();
-  Serial2.print(my_query+"\n");
+  
+  if(!answering_mode){
+    clean_Serial2_Port();
+    Serial2.print(my_query+"\n");
 
-  String answer = check_Anwer_ESP32(my_query,waiting_time);
-  answer.trim(); // remove any newline characters at the end of the answer string
-  return answer;
+    String answer = check_Anwer_ESP32(my_query,waiting_time);
+    answer.trim(); // remove any newline characters at the end of the answer string
+    answering_mode = false;
+    return answer;
+  }else{
+    Serial.print("Veulliez patienter, je suis en mode réponse pour ESP32");
+    return return_error_msg(my_query);
+  }
 }
 String return_error_msg(String query){
   if (query=="getDate" || query=="geTime"){
@@ -118,43 +100,50 @@ void analyse_query(String msg){
 
 
   //________________Web QUERY_________________//
-  if (msg=="get_pv_current"){
-    read_data_and_send("ESP32","ppv020.txt");
-  }
-  else if (msg=="get_battery_pack_voltage"){
-    read_data_and_send("ESP32","bat100.txt");
-  }
-  else if (msg=="get_battery_voltage_1"){
-    read_data_and_send("ESP32","bat101.txt");
-  }
-  else if (msg=="get_battery_voltage_2"){
-    read_data_and_send("ESP32","bat102.txt");
-  }
-  else if (msg=="get_battery_voltage_3"){
-    read_data_and_send("ESP32","bat103.txt");
-  }
-  else if (msg=="get_battery_voltage_4"){
-    read_data_and_send("ESP32","bat104.txt");
+  if (msg=="set_mode_to_hearing"){
+    answering_mode = true;
+  }else{
+
+    if (msg=="get_pv_current"){
+      read_data_and_send("ESP32","ppv020.txt");
+    }
+    else if (msg=="get_battery_pack_voltage"){
+      read_data_and_send("ESP32","bat100.txt");
+    }
+    else if (msg=="get_battery_voltage_1"){
+      read_data_and_send("ESP32","bat101.txt");
+    }
+    else if (msg=="get_battery_voltage_2"){
+      read_data_and_send("ESP32","bat102.txt");
+    }
+    else if (msg=="get_battery_voltage_3"){
+      read_data_and_send("ESP32","bat103.txt");
+    }
+    else if (msg=="get_battery_voltage_4"){
+      read_data_and_send("ESP32","bat104.txt");
+    }
+
+    else if (msg=="get_battery_pack_current"){
+      read_data_and_send("ESP32","bat020.txt");
+    }
+    else if (msg=="get_battery_SOC"){
+      read_data_and_send("ESP32","bat500.txt");
+    }
+    else if (msg=="get_battery_SOH"){
+      read_data_and_send("ESP32","bat600.txt");
+    }
+    else if (msg=="get_battery_temperature"){
+      read_data_and_send("ESP32","bat401.txt");
+    }
+    else if (msg=="get_charge_current"){
+      read_data_and_send("ESP32","chr010.txt");
+    }
+    else if (msg=="get_report"){
+      read_data_and_send("ESP32","report.txt");
+    }
   }
 
-  else if (msg=="get_battery_pack_current"){
-    read_data_and_send("ESP32","bat020.txt");
-  }
-  else if (msg=="get_battery_SOC"){
-    read_data_and_send("ESP32","bat500.txt");
-  }
-  else if (msg=="get_battery_SOH"){
-    read_data_and_send("ESP32","bat600.txt");
-  }
-  else if (msg=="get_battery_temperature"){
-    read_data_and_send("ESP32","bat401.txt");
-  }
-  else if (msg=="get_charge_current"){
-    read_data_and_send("ESP32","chr010.txt");
-  }
-  else if (msg=="get_report"){
-    read_data_and_send("ESP32","report.txt");
-  }
+  
 
   //________________TEST QUERY_________________//
   if (msg=="getIP"){

@@ -3,8 +3,9 @@ Pour la personne qui va lire ce code:
     Ce header file (.h) permet d'avoir un fichier aillant tous les includes/constantes nécessaires au bon déroulement de notre protoype.
     Cela permet surtout une lecture plus aisée du projet.
 */
+#include "all_constant2.h"
 
-#include "all_constant2.h" 
+
 
 #include <SD.h>
 #include <SPI.h>
@@ -48,6 +49,7 @@ int init_flag_SD = 0;
 
 //_____________________ESP32______________________//
 String esp32_ip = "";
+bool answering_mode = false; //It allows to block send any queries to ESP32 if this mode is activated
 //_____________________Measures______________________//
 // Define the input and output pins for the current sensors
 #define INPUT_CURRENT_PIN A0
@@ -56,9 +58,7 @@ String esp32_ip = "";
 #define SAMPLE_INTERVAL 1000
 #define NUM_SAMPLES 10
 // Define variables to store the input and output currents and the charge flow
-float inputCurrent = 0;
-float outputCurrent = 0;
-float chargeFlow = 0;
+float SOC_init = 0.8;
 
 // Define a variable to keep track of the last sample time
 unsigned long lastSampleTime = 0;

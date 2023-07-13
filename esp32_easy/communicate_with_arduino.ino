@@ -28,6 +28,8 @@ String send_query_Arduino(String my_query,int waiting_time){
   //La fonction send_query() est appelée au niveau de asynch_server
 
   //Serial2.println("Here's my query : "+my_query+"! You have "+String(waiting_time)+" seconds to give me the answer!");
+  
+  Serial2.print("set_mode_to_hearing"+'\n');
   cleanSerialPort();
   Serial2.print(my_query+'\n');
   
